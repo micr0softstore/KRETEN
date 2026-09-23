@@ -1,0 +1,13 @@
+{% extends 'base.html' %}{% from 'components.html' import heading, empty %}{% block title %}Üzenetek · KRETÉN{% endblock %}{% block content %}
+{{ heading('Üzenetek', 'Iskolai hírek és beszélgetések, egy helyen.') }}
+<div class="toolbar"><nav class="tabs" aria-label="Üzenetmappák">{% for folder, label in folders.items() %}<a class="tab {{ 'is-active' if current_folder == folder }}" href="{{ url_for('uzenetek', folder=folder) }}">{{ label }}</a>{% endfor %}</nav><input type="search" class="form-control filter-control" placeholder="Keresés az üzenetekben…" aria-label="Üzenet keresése" data-filter-input data-filter-target="messages"></div>
+{% if current_folder == 'iskolai' %}
+<p class="muted small">Feljegyzések és faliújság-hírek a tanévből. Nyisd le az értesítést a teljes szöveghez.</p>
+<div class="stack" id="messages">
+{% for notice in notices %}<details class="card school-notice" data-filter-text="{{ notice.author }} {{ notice.title }} {{ notice.source_label }}"><summary class="message-row"><span class="avatar small-avatar" aria-hidden="true">{{ notice.author[:1] or 'i' }}</span><span class="message-copy"><strong>{{ notice.title }}</strong><span class="muted small">{{ notice.author }} · {{ notice.source_label }}{% if notice.type_label %} · {{ notice.type_label }}{% endif %}</span></span><span class="muted small">{{ notice.date }}</span><span aria-hidden="true">⌄</span></summary><div class="card-body prose message-body">{{ notice.text|plain_text }}</div></details>{% else %}<section class="card">{{ empty('Ebben a tanévben még nincs iskolai értesítés.') }}</section>{% endfor %}
+</div>
+{% else %}
+<p class="muted small">Az e-Ügyintézés postafiókja. A napló feljegyzéseit és híreit az Iskolai értesítések lapon találod.</p>
+<section class="card" id="messages">{% for message in messages %}<a class="message-row {{ 'is-unread' if not message.is_read }}" href="{{ url_for('uzenet_reszletek', message_id=message.id) }}" data-filter-text="{{ message.sender_name }} {{ message.subject }}"><span class="avatar small-avatar" aria-hidden="true">{{ message.sender_name[:1] }}</span><span class="message-copy"><strong>{{ message.subject }}</strong><span class="muted small">{{ message.sender_name }}{% if message.has_attachment %} · Melléklet{% endif %}</span></span><span class="muted small">{{ message.date }}</span><span aria-hidden="true">→</span></a>{% else %}{{ empty('Ez a mappa most üres.') }}{% endfor %}</section>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,106 @@
+{% macro icon(name, cls='') -%}
+<svg class="icon {{ cls }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+{% if name == 'home' %}<path d="m3 10 9-7 9 7v10H3Z"/><path d="M9 20v-7h6v7"/>
+{% elif name == 'calendar' %}<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 11h18M8 15h2M14 15h2"/>
+{% elif name == 'grades' %}<rect x="4" y="3" width="16" height="18" rx="2"/><path d="m8 10 2 2 5-5M8 16h8"/>
+{% elif name == 'chart' %}<path d="M4 3v17h17M9 15v-4M14 15V7M19 15V4"/>
+{% elif name == 'book' %}<path d="M12 5C8 2 4 3 2 4v15c3-1 6-1 10 2 4-3 7-3 10-2V4c-2-1-6-2-10 1Z M12 5v16"/>
+{% elif name == 'absence' %}<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>
+{% elif name == 'mail' %}<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>
+{% elif name == 'people' %}<circle cx="9" cy="8" r="3"/><path d="M3 21v-2a6 6 0 0 1 12 0v2M16 5a3 3 0 0 1 0 6M21 21v-2a6 6 0 0 0-3-5"/>
+{% elif name == 'sparkle' %}<path d="m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5ZM20 2v4M18 4h4"/>
+{% elif name == 'user' %}<circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/>
+{% elif name == 'settings' %}<path d="m10 3-.5 3-2 1-2.8-1L3 9l2.3 2v2L3 15l1.7 3L7.5 17l2 1 .5 3h4l.5-3 2-1 2.8 1 1.7-3-2.3-2v-2L21 9l-1.7-3-2.8 1-2-1L14 3Z"/><circle cx="12" cy="12" r="3"/>
+{% elif name == 'logout' %}<path d="M9 4H4v16h5M10 12h11m-4-4 4 4-4 4"/>
+{% elif name == 'moon' %}<path d="M21 13A9 9 0 0 1 11 3a9 9 0 1 0 10 10Z"/>
+{% elif name == 'sun' %}<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1 1m12 12 1 1M5 19l1-1M18 6l1-1"/>
+{% elif name == 'menu' %}<path d="M4 6h16M4 12h16M4 18h16"/>
+{% elif name == 'close' %}<path d="m6 6 12 12M6 18 18 6"/>
+{% elif name == 'arrow' %}<path d="M4 12h16m-6-6 6 6-6 6"/>
+{% elif name == 'search' %}<circle cx="10" cy="10" r="6"/><path d="m15 15 6 6"/>
+{% elif name == 'chevron' %}<path d="m6 9 6 6 6-6"/>
+{% elif name == 'eye' %}<path d="M2 12c5-9 15-9 20 0-5 9-15 9-20 0Z"/><circle cx="12" cy="12" r="3"/>
+{% elif name == 'shield' %}<path d="m12 3 8 3v6c0 5-8 9-8 9s-8-4-8-9V6Z"/><path d="m8 12 3 3 5-6"/>
+{% endif %}
+</svg>
+{%- endmacro %}
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="color-scheme" content="light dark">
+    <meta name="theme-color" content="#10141f">
+    <title>{% block title %}KRETÉN{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
+    <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='pages.css') }}">
+    <script src="{{ url_for('static', filename='pages.js') }}" defer></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='wallpaper.css') }}">
+    <script src="{{ url_for('static', filename='wallpaper.js') }}" defer></script>
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="{% if current_user.is_authenticated %}app-page{% else %}auth-page{% endif %}">
+    <a href="#main-content" class="skip-link">Ugrás a tartalomhoz</a>
+    {% if current_user.is_authenticated %}
+    <button class="sidebar-backdrop" data-close-menu type="button" tabindex="-1" aria-label="Menü bezárása" hidden></button>
+    <aside class="sidebar" id="app-navigation" aria-label="Fő navigáció">
+        <a class="brand" href="{{ url_for('dashboard') }}" aria-label="KRETÉN kezdőlap">
+            <img class="brand-logo logo-for-light" src="{{ url_for('static', filename='brand/logo-dark.png') }}" alt="KRETÉN" width="138" height="60"><img class="brand-logo logo-for-dark" src="{{ url_for('static', filename='brand/logo-light.png') }}" alt="KRETÉN" width="138" height="60">
+            <span class="brand-description">A suli, átláthatóan.</span>
+        </a>
+        <button class="icon-button sidebar-close" data-close-menu type="button" aria-label="Menü bezárása">{{ icon('close') }}</button>
+        <div class="nav-section-label">NAPLÓ</div>
+        <nav class="nav-list">
+            {% for endpoint, label, symbol in [('dashboard', 'Áttekintés', 'home'), ('orarend', 'Órarend', 'calendar'), ('jegyek', 'Jegyek', 'grades'), ('jegyek_statisztika', 'Statisztikák', 'chart'), ('homework_page', 'Házi feladatok', 'book'), ('absences_page', 'Hiányzások', 'absence')] %}
+            <a class="nav-link {% if request.endpoint == endpoint %}is-active{% endif %}" href="{{ url_for(endpoint) }}" {% if request.endpoint == endpoint %}aria-current="page"{% endif %}>{{ icon(symbol) }}<span>{{ label }}</span>{% if request.endpoint == endpoint %}<span class="nav-active-dot"></span>{% endif %}</a>
+            {% endfor %}
+        </nav>
+        <div class="nav-section-label">ISKOLAI ÉLET</div>
+        <nav class="nav-list">
+            {% for endpoint, label, symbol in [('uzenetek', 'Üzenetek', 'mail'), ('fogadoorak', 'Fogadóórák', 'people'), ('lep_events', 'LEP programok', 'sparkle')] %}
+            <a class="nav-link {% if request.endpoint == endpoint or (endpoint == 'uzenetek' and request.endpoint == 'uzenet_reszletek') %}is-active{% endif %}" href="{{ url_for(endpoint) }}" {% if request.endpoint == endpoint %}aria-current="page"{% endif %}>{{ icon(symbol) }}<span>{{ label }}</span></a>
+            {% endfor %}
+        </nav>
+        <div class="sidebar-bottom">
+            <nav class="nav-list">
+                <a class="nav-link {% if request.endpoint == 'profile' %}is-active{% endif %}" href="{{ url_for('profile') }}">{{ icon('user') }}<span>Profilom</span></a>
+                <a class="nav-link {% if request.endpoint == 'settings' %}is-active{% endif %}" href="{{ url_for('settings') }}">{{ icon('settings') }}<span>Beállítások</span></a>
+            </nav>
+            <form action="{{ url_for('logout') }}" method="post" class="logout-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="nav-link logout-button">{{ icon('logout') }}<span>Kijelentkezés</span></button>
+            </form>
+            <p class="sidebar-note">Független KRÉTA-kliens<br><span>KRETÉN · web</span></p>
+        </div>
+    </aside>
+    <div class="app-shell">
+        <header class="topbar">
+            <div class="topbar-left"><button type="button" class="icon-button menu-toggle" data-open-menu aria-controls="app-navigation" aria-expanded="false" aria-label="Navigáció megnyitása">{{ icon('menu') }}</button><span class="topbar-caption">Minden, ami a suliban történik.</span></div>
+            <div class="topbar-actions"><span class="desktop-only topbar-label">A te naplód.</span><button type="button" class="icon-button theme-toggle" data-theme-toggle aria-label="Sötét megjelenés bekapcsolása" title="Megjelenés váltása">{{ icon('moon', 'theme-moon') }}{{ icon('sun', 'theme-sun') }}</button><a href="{{ url_for('profile') }}" class="avatar-button" aria-label="Profilom">{{ icon('user') }}</a></div>
+        </header>
+    {% else %}
+        <div class="auth-decoration" aria-hidden="true"></div>
+        <button type="button" class="icon-button auth-theme theme-toggle" data-theme-toggle aria-label="Sötét megjelenés bekapcsolása" title="Megjelenés váltása">{{ icon('moon', 'theme-moon') }}{{ icon('sun', 'theme-sun') }}</button>
+    {% endif %}
+
+    <main id="main-content" class="{% if current_user.is_authenticated %}main-content{% else %}auth-main{% endif %}">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}<div class="flash-stack" aria-live="polite">{% for category, message in messages %}<div class="alert {% if category in ['error', 'danger'] %}alert-error{% elif category == 'warning' %}alert-warning{% else %}alert-info{% endif %}" role="{% if category in ['error', 'danger'] %}alert{% else %}status{% endif %}">{{ message }}</div>{% endfor %}</div>{% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </main>
+
+    {% if current_user.is_authenticated %}
+        <footer class="app-footer"><span>KRETÉN</span><span>Független, közösségi KRÉTA-kliens.</span></footer>
+    </div>
+    <nav class="bottom-nav" aria-label="Gyors navigáció">
+        {% for endpoint, label, symbol in [('dashboard', 'Áttekintés', 'home'), ('orarend', 'Órarend', 'calendar'), ('jegyek', 'Jegyek', 'grades'), ('uzenetek', 'Üzenetek', 'mail')] %}<a href="{{ url_for(endpoint) }}" class="{% if request.endpoint == endpoint %}is-active{% endif %}" {% if request.endpoint == endpoint %}aria-current="page"{% endif %}>{{ icon(symbol) }}<span>{{ label }}</span></a>{% endfor %}
+        <button type="button" data-open-menu aria-controls="app-navigation" aria-expanded="false">{{ icon('menu') }}<span>Továbbiak</span></button>
+    </nav>
+    {% endif %}
+    {% include 'wallpaper_controls.html' %}
+    {% block scripts %}{% endblock %}
+</body>
+</html>

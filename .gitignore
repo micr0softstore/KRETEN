@@ -1,0 +1,16 @@
+# Credentials, per-user sessions, and local configuration
+refresh_token.txt
+.env
+.env.*
+!.env.example
+instance/
+*.sqlite3
+*.sqlite3-shm
+*.sqlite3-wal
+# Local runtime / generated files
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+work/
+*.log

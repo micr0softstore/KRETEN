@@ -1,0 +1,48 @@
+/* The original KRETÉN concept's two-color, rotating gradient. */
+:root{--wallpaper-color-one:#3e8ef7;--wallpaper-color-two:#6c5ce7}
+.auth-decoration{background:#222;overflow:hidden;pointer-events:none}
+.auth-decoration::before,.wallpaper-preview::before{content:"";position:absolute;width:200%;height:200%;top:-50%;left:-50%;bottom:auto;right:auto;border-radius:0;opacity:1;background:radial-gradient(circle at 30% 30%,var(--wallpaper-color-one),transparent 50%),radial-gradient(circle at 70% 70%,var(--wallpaper-color-two),transparent 50%);animation:wallpaper-drift 15s infinite linear;filter:blur(80px);transform-origin:center}
+.auth-decoration::after{display:none}
+@keyframes wallpaper-drift{0%{transform:translate(0,0) rotate(0deg)}50%{transform:translate(20%,20%) rotate(180deg)}100%{transform:translate(0,0) rotate(360deg)}}
+:root[data-wallpaper-motion=paused] .auth-decoration::before,:root[data-wallpaper-motion=paused] .wallpaper-preview::before{animation-play-state:paused}
+.wallpaper-settings-trigger{position:fixed;right:72px;top:24px;z-index:5;color:#e7eaf2;border-color:#ffffff25;background:#ffffff10}
+.wallpaper-settings-trigger:hover{background:#ffffff20;color:#fff}
+.wallpaper-dialog{width:min(420px,calc(100% - 32px));max-height:calc(100dvh - 32px);padding:24px;border:1px solid var(--border);border-radius:18px;background:var(--surface);color:var(--text);box-shadow:0 24px 80px #0005;overflow:auto;overscroll-behavior:contain}
+.wallpaper-dialog::backdrop{background:#0b102575;backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px)}
+.wallpaper-dialog-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:12px}
+.wallpaper-dialog-heading .eyebrow{font-size:.64rem;margin-bottom:6px}
+.wallpaper-dialog-heading h2{font-size:1.35rem;letter-spacing:-.4px;margin:0}
+.wallpaper-dialog-heading .icon-button{width:32px;height:32px;flex-shrink:0}
+.wallpaper-dialog p{line-height:1.55}
+.wallpaper-preview{position:relative;height:76px;border-radius:10px;overflow:hidden;background:#222;margin-bottom:20px;isolation:isolate}
+.wallpaper-preview::before{filter:blur(18px)}
+.wallpaper-fieldset{border:0;padding:0;margin:0 0 20px;min-width:0}
+.wallpaper-fieldset legend{font-weight:650;font-size:.8rem;margin-bottom:9px;padding:0}
+.wallpaper-presets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.wallpaper-preset{display:flex;align-items:center;gap:6px;justify-content:center;background:var(--surface-soft);border:1px solid var(--border);padding:8px 5px;border-radius:8px;color:var(--text);font-size:.7rem;min-height:39px}
+.wallpaper-preset:hover{background:var(--surface-hover)}
+.wallpaper-preset[aria-pressed=true]{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 0 0 1px var(--accent);color:var(--accent-strong)}
+.wallpaper-swatch{width:17px;height:17px;border-radius:50%;flex-shrink:0;box-shadow:inset 0 0 0 1px #ffffff30}
+.wallpaper-swatch-original{background:linear-gradient(135deg,#3e8ef7,#6c5ce7)}
+.wallpaper-swatch-sunset{background:linear-gradient(135deg,#f48c45,#db4078)}
+.wallpaper-swatch-mint{background:linear-gradient(135deg,#22b892,#3b7be6)}
+.wallpaper-colors{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.wallpaper-color{display:grid;grid-template-columns:42px 1fr;align-items:center;gap:7px 9px;padding:12px;background:var(--surface-soft);border:1px solid var(--border);border-radius:10px;cursor:pointer}
+.wallpaper-color>span{grid-column:1/-1;font-size:.75rem;color:var(--muted)}
+.wallpaper-color input{width:42px;height:32px;display:block;min-width:0;border:0;padding:0;background:transparent;cursor:pointer;border-radius:5px}
+.wallpaper-color input::-webkit-color-swatch-wrapper{padding:0}
+.wallpaper-color input::-webkit-color-swatch{border:1px solid #80808040;border-radius:5px}
+.wallpaper-color input::-moz-color-swatch{border:1px solid #80808040;border-radius:5px}
+.wallpaper-color output{font-size:.74rem;white-space:nowrap;font-variant-numeric:tabular-nums}
+.wallpaper-motion{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-bottom:16px;border-bottom:1px solid var(--border);cursor:pointer}
+.wallpaper-motion strong{display:block;font-size:.8rem;font-weight:650}
+.wallpaper-motion small{display:block;font-size:.72rem;color:var(--muted);margin-top:3px}
+.wallpaper-motion input{width:19px;height:19px;accent-color:var(--accent);flex-shrink:0;margin:0;cursor:pointer}
+.wallpaper-motion input:disabled{cursor:default}
+.wallpaper-theme-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px;font-size:.8rem}
+.wallpaper-save-note{font-size:.7rem;color:var(--muted);margin:20px 0 14px}
+.wallpaper-dialog-actions{display:flex;align-items:center;justify-content:space-between;gap:12px}
+@media(max-width:760px){.wallpaper-settings-trigger{top:18px;right:66px}}
+@media(max-width:390px){.wallpaper-dialog{padding:20px}.wallpaper-color{padding:9px;gap:7px}.wallpaper-color output{font-size:.68rem}.wallpaper-preset{font-size:.64rem;gap:4px}.wallpaper-swatch{width:14px;height:14px}}
+@media(prefers-reduced-motion:reduce){.auth-decoration::before,.wallpaper-preview::before{animation:none}}
+@media print{.wallpaper-settings-trigger,.wallpaper-dialog{display:none!important}}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Bejelentkezés · KRETÉN{% endblock %}
+{% block content %}
+<section class="login-card" aria-labelledby="login-title">
+    <div class="login-heading"><img class="login-logo logo-for-light" src="{{ url_for('static', filename='brand/logo-dark.png') }}" alt="KRETÉN" width="138" height="60"><img class="login-logo logo-for-dark" src="{{ url_for('static', filename='brand/logo-light.png') }}" alt="KRETÉN" width="138" height="60"><h1 id="login-title">Bejelentkezés</h1><p>A sulid egy kicsit egyszerűbben.</p></div>
+    <form method="post" action="{{ url_for('login') }}" class="login-form" data-login-form>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="field institution-field" data-institution-picker>
+            <div class="institution-search-panel" hidden>
+                <label class="form-label" for="institution-search">Intézmény</label>
+                <div class="combobox-wrap"><span class="input-icon">{{ icon('search') }}</span><input type="text" id="institution-search" class="form-control has-icon" placeholder="Keresés név vagy intézménykód alapján" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-haspopup="listbox" aria-controls="institution-options" aria-describedby="institution-help" autocomplete="off" spellcheck="false"><span class="input-end-icon">{{ icon('chevron') }}</span><ul id="institution-options" class="institution-options" role="listbox" aria-label="Intézmények" hidden></ul></div>
+                <p class="field-help" id="institution-help" aria-live="polite">Intézménylista betöltése…</p>
+            </div>
+            <div class="institution-manual-panel">
+                <label class="form-label" for="institute_code">Intézménykód</label>
+                <input type="text" id="institute_code" name="institute_code" class="form-control" placeholder="pl. bit-edu" required autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="100" aria-describedby="manual-institution-help">
+                <p class="field-help" id="manual-institution-help">Az iskola KRÉTA-címében szereplő kód, például: bit-edu.</p>
+            </div>
+            <button type="button" class="text-button institution-mode-toggle" data-institution-mode hidden>Intézménykód megadása kézzel</button>
+            <p class="field-help institution-status" data-institution-status role="status"></p>
+        </div>
+        <div class="field"><label class="form-label" for="username">Felhasználónév</label><input type="text" id="username" name="username" class="form-control" required autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="KRÉTA-felhasználónév" maxlength="200"></div>
+        <div class="field"><label class="form-label" for="password">Jelszó</label><div class="password-wrap"><input type="password" id="password" name="password" class="form-control" required autocomplete="current-password" placeholder="KRÉTA-jelszó"><button type="button" class="password-toggle" data-password-toggle aria-label="Jelszó megjelenítése" aria-pressed="false">{{ icon('eye') }}</button></div></div>
+        <button type="submit" class="button button-primary login-submit">Bejelentkezés {{ icon('arrow') }}</button>
+        <div class="login-trust">{{ icon('shield') }}<span>A megszokott KRÉTA-fiókoddal.</span></div>
+    </form>
+    <div class="login-footer"><span>Független, közösségi KRÉTA-kliens.</span><span>Nem a KRÉTA hivatalos alkalmazása.</span></div>
+</section>
+<p class="auth-credit">KRETÉN <span>·</span> A suli, átláthatóan.</p>
+{% endblock %}

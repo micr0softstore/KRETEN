@@ -1,0 +1,30 @@
+{% if not current_user.is_authenticated %}
+<button type="button" class="icon-button wallpaper-settings-trigger" data-wallpaper-open aria-haspopup="dialog" aria-controls="wallpaper-settings" aria-label="Háttér és színek beállítása" title="Háttér és színek">{{ icon('settings') }}</button>
+{% endif %}
+<dialog id="wallpaper-settings" class="wallpaper-dialog" aria-labelledby="wallpaper-title" aria-describedby="wallpaper-description">
+    <div class="wallpaper-dialog-heading">
+        <div><p class="eyebrow">MEGJELENÉS</p><h2 id="wallpaper-title">Színek és háttér</h2></div>
+        <button type="button" class="icon-button" data-wallpaper-close aria-label="Beállítások bezárása">{{ icon('close') }}</button>
+    </div>
+    <p id="wallpaper-description" class="muted small">A belépési oldal színkeveréke. A beállításokat ez a böngésző jegyzi meg.</p>
+    <div class="wallpaper-preview" aria-hidden="true"></div>
+    <fieldset class="wallpaper-fieldset">
+        <legend>Színkeverékek</legend>
+        <div class="wallpaper-presets">
+            <button type="button" class="wallpaper-preset" data-wallpaper-preset="original" aria-pressed="true"><span class="wallpaper-swatch wallpaper-swatch-original" aria-hidden="true"></span>KRETÉN</button>
+            <button type="button" class="wallpaper-preset" data-wallpaper-preset="sunset" aria-pressed="false"><span class="wallpaper-swatch wallpaper-swatch-sunset" aria-hidden="true"></span>Naplemente</button>
+            <button type="button" class="wallpaper-preset" data-wallpaper-preset="mint" aria-pressed="false"><span class="wallpaper-swatch wallpaper-swatch-mint" aria-hidden="true"></span>Menta</button>
+        </div>
+    </fieldset>
+    <fieldset class="wallpaper-fieldset">
+        <legend>Saját színek</legend>
+        <div class="wallpaper-colors">
+            <label class="wallpaper-color" for="wallpaper-color-one"><span>Első szín</span><input type="color" id="wallpaper-color-one" data-wallpaper-color="color1" value="#3e8ef7"><output for="wallpaper-color-one" data-wallpaper-value="color1">#3e8ef7</output></label>
+            <label class="wallpaper-color" for="wallpaper-color-two"><span>Második szín</span><input type="color" id="wallpaper-color-two" data-wallpaper-color="color2" value="#6c5ce7"><output for="wallpaper-color-two" data-wallpaper-value="color2">#6c5ce7</output></label>
+        </div>
+    </fieldset>
+    <label class="wallpaper-motion" for="wallpaper-animation"><span><strong>Mozgó háttér</strong><small data-wallpaper-motion-note>A színek lassan körbefordulnak.</small></span><input id="wallpaper-animation" type="checkbox" data-wallpaper-animation checked></label>
+    <div class="wallpaper-theme-row"><span>Világos vagy sötét?</span><button type="button" class="button button-secondary button-small" data-theme-toggle>Téma váltása</button></div>
+    <p class="wallpaper-save-note" data-wallpaper-storage role="status">A változtatások automatikusan mentődnek.</p>
+    <div class="wallpaper-dialog-actions"><button type="button" class="button button-ghost button-small" data-wallpaper-reset>Eredeti háttér</button><button type="button" class="button button-primary button-small" data-wallpaper-close>Kész</button></div>
+</dialog>
