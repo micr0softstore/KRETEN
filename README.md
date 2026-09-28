@@ -22,10 +22,11 @@ Do not place credentials in source files, tests, screenshots, environment files,
 
 ## Pages and behavior
 
-- Overview: next lesson, today's timetable, recent grades, weighted average, upcoming homework/tests, school-year dates. An unavailable section does not prevent the others from rendering.
+- Overview: current/next lesson, today's timetable, recent grades, weighted average, upcoming homework/tests, school-year dates. Current lessons and breaks show a live countdown and elapsed-time progress bar, advancing automatically at lesson boundaries. An unavailable section does not prevent the others from rendering.
 - Timetable: previous/current/next week, subject/teacher/room filtering, canceled and substituted lessons, expandable details. Weekend lessons are retained when present. Times use Europe/Budapest.
 - Grades: subject groups, explicit weights, textual grades, semester filters, reveal-on-click preference, overall/monthly/per-subject statistics and custom date-range analysis.
-- Homework and announced tests; homework ranges longer than three weeks are split into bounded API requests and merged without duplicate IDs. Absences show justification status and lateness minutes.
+- Homework and announced tests; homework ranges longer than three weeks are split into bounded API requests and merged without duplicate IDs. Offset timestamps are converted to Europe/Budapest before deriving calendar dates, including exam dates; date-only values stay unchanged. Absences show justification status and lateness minutes.
+- Messages opens school notices from Feljegyzések and Faliújság, combined newest first with expandable text and search. These diary notices remain separate from the e-administration mailbox folders.
 - Inbox/sent/deleted folders and message details use the same separate folder endpoints as KRÉTA’s current web client; parsing tolerates optional message fields and nested detail metadata. These requests use separate service headers because the diary mobile identifier causes connection resets at the e-administration service. External HTML is rendered as non-executable text.
 - Consultation schedules, LEP events and permissions, profile/contact/bank-account actions, appearance settings.
 - Desktop sidebar, mobile drawer/bottom navigation, light/dark mode, locally served CSS/JS and concept logos. No CDN dependency.
@@ -56,9 +57,10 @@ Set `KRETEN_HTTPS=1` only with HTTPS; it enables Secure cookies and HSTS. Config
 
 ```sh
 python3 -m unittest discover -s tests -v
+node tests/test_lesson_status.js
 ```
 
-Additional API contract tests cover bounded homework requests, grouped consultation responses, nested mailbox folders and optional fields, service-specific headers, bank write permissions/payloads, and private failure diagnostics.
+Additional API contract tests cover bounded homework requests, school notices and safe rendering, grouped consultation responses, nested mailbox folders and optional fields, service-specific headers, bank write permissions/payloads, and private failure diagnostics. Date regressions cover UTC-to-Budapest midnight rollover and daylight-saving transitions. Lesson timer tests cover lesson/break boundaries, canceled lessons, overnight gaps, and the mounted countdown/progress behavior with a mismatched browser clock.
 
 The suite uses only fictional fixtures and disposable session stores, and blocks real network access in integration tests. It covers all main pages populated/empty, the marks regression, weighted statistics/date boundaries, institution code mapping and search fallbacks, CSRF and HTML injection, cookie privacy, independent users/institutions, logout, OAuth PKCE/state, token refresh races, and separate worker processes.
 

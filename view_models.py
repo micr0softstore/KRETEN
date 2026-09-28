@@ -4,6 +4,8 @@ from datetime import date, datetime
 from zoneinfo import ZoneInfo
 from bs4 import BeautifulSoup
 
+from date_utils import local_date_string
+
 
 def today():
     return datetime.now(ZoneInfo('Europe/Budapest')).date()
@@ -80,7 +82,7 @@ def absence_rows(items):
         lesson = item.get('Ora') or {}
         status = text_value(item.get('IgazolasAllapota')) or 'Elbírálás alatt'
         rows.append({'subject': text_value(item.get('Tantargy') or lesson.get('Tantargy')) or 'Foglalkozás',
-                     'date': str(item.get('Datum') or lesson.get('KezdetIdopont') or '')[:10],
+                     'date': local_date_string(item.get('Datum') or lesson.get('KezdetIdopont')),
                      'type': text_value(item.get('Tipus')) or 'Hiányzás', 'status': status,
                      'minutes': item.get('KesesPercben') or 0,
                      'justified': 'igazolt' in status.lower() and 'igazolatlan' not in status.lower()})
@@ -90,7 +92,7 @@ def absence_rows(items):
 def test_rows(items):
     return sorted([{'subject': text_value(item.get('Tantargy')) or item.get('TantargyNeve') or 'Számonkérés',
                     'topic': item.get('Temaja') or item.get('Tema') or item.get('Nev') or '',
-                    'date': str(item.get('Datum') or item.get('SzamonkeresDatuma') or '')[:10],
+                    'date': local_date_string(item.get('Datum') or item.get('SzamonkeresDatuma')),
                     'teacher': item.get('RogzitoTanarNeve') or item.get('TanarNeve') or '',
                     'type': text_value(item.get('Modja') or item.get('Tipus'))}
                    for item in items or []], key=lambda item: item['date'])

@@ -1,0 +1,13 @@
+<section class="next-lesson card lesson-status" data-lesson-clock="{{ lesson_clock|tojson|forceescape }}" aria-label="Aktuális óra és szünet">
+  <div class="card-body">
+    <div class="row"><span class="eyebrow" data-lesson-label>{{ lesson_status.label }}</span><span class="badge" data-lesson-date>{{ lesson_status.date or 'Szabad idő' }}</span></div>
+    <h2 data-lesson-title>{{ lesson_status.title }}</h2>
+    <p data-lesson-details>{{ lesson_status.details }}</p>
+    <span class="small" data-lesson-teacher>{{ lesson_status.teacher }}</span>
+    <div class="lesson-timer" data-lesson-timer {% if lesson_status.kind not in ['lesson', 'break'] %}hidden{% endif %}>
+      <strong class="lesson-remaining" data-lesson-remaining>{{ lesson_status.remaining }}</strong>
+      <progress class="lesson-progress" data-lesson-progress value="{{ lesson_status.progress }}" max="100" aria-label="{{ lesson_status.progress_label }}">{{ lesson_status.progress }}%</progress>
+    </div>
+    <a class="next-arrow" href="{{ url_for('orarend') }}" aria-label="Órarend megnyitása">↗</a>
+  </div>
+</section>

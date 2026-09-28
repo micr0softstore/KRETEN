@@ -1,15 +1,15 @@
 """KRÉTA API adapter. Authentication material is instance-scoped and never logged."""
 from base64 import urlsafe_b64encode
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 from hashlib import sha256
 import re
 import secrets
 from urllib.parse import parse_qs, urlencode, urlparse, urljoin, quote
-from zoneinfo import ZoneInfo
 
 from bs4 import BeautifulSoup
 import requests
 
+from date_utils import local_datetime
 from institutions import validate_institution_code
 from session_store import clean_tokens
 
@@ -341,6 +341,46 @@ class KretaUtils:
     def get_announced_tests(self, date=None):
         return self._get('announcedTests', {'datumTol': date} if date else None)
 
+    def get_school_notices(self, source='notes', start_date=None):
+        if source not in ('notes', 'board'):
+            raise ValueError('Érvénytelen iskolai üzenetforrás.')
+        params = {'datumTol': date.fromisoformat(start_date).isoformat()} if start_date else None
+        key = 'notes' if source == 'notes' else 'events'
+        return self.convert_school_notices(self._get(key, params), source)
+
+    def convert_school_notices(self, json_data, source):
+        """Normalize Firka's InfoBoard/NoticeBoard models for escaped web cards."""
+        if source not in ('notes', 'board'):
+            raise ValueError('Érvénytelen iskolai üzenetforrás.')
+        if not isinstance(json_data, list) or any(not isinstance(item, dict) for item in json_data):
+            raise KretaAPIError('A KRÉTA iskolai üzenetlistája érvénytelen.', api_code='API_FORMAT')
+        notices = []
+        for item in json_data:
+            if source == 'notes':
+                date_value = item.get('Datum') or item.get('KeszitesDatuma')
+                author = item.get('KeszitoTanarNeve')
+                content = item.get('Tartalom') or item.get('TartalomFormazott') or ''
+                type_label = self._label(item.get('Tipus'), 'Leiras') or self._label(item.get('Tipus'))
+            else:
+                date_value = item.get('ErvenyessegKezdete')
+                author = item.get('RogzitoNeve')
+                content = item.get('TartalomText') or item.get('Tartalom') or ''
+                type_label = ''
+            date_value = self._datetime(date_value)
+            notices.append({
+                'id': str(item.get('Uid') or ''),
+                'title': str(item.get('Cim') or 'Nincs cím'),
+                'author': str(author or ''),
+                'date': date_value.strftime('%Y-%m-%d %H:%M') if date_value else '',
+                # Prefer the API's text version. Templates strip any remaining
+                # markup with plain_text and retain Jinja's automatic escaping.
+                'text': str(content),
+                'source_label': 'Feljegyzések' if source == 'notes' else 'Faliújság',
+                'type_label': str(type_label or ''),
+            })
+        return sorted(notices, key=lambda item: item['date'], reverse=True)
+
+
     def get_notes(self, date=None):
         return self._get('notes', {'datumTol': date} if date else None)
 
@@ -451,13 +491,7 @@ class KretaUtils:
 
     @staticmethod
     def _datetime(value):
-        if not value:
-            return None
-        try:
-            parsed = datetime.fromisoformat(str(value).replace('Z', '+00:00'))
-            return parsed.astimezone(ZoneInfo('Europe/Budapest')) if parsed.tzinfo else parsed
-        except (ValueError, TypeError):
-            return None
+        return local_datetime(value)
 
     @staticmethod
     def _label(value, key='Nev', default=''):

@@ -8,6 +8,7 @@ from flask_wtf.csrf import CSRFProtect, CSRFError
 from dotenv import load_dotenv
 from kreta_utils import KretaUtils, AuthenticationError, KretaAPIError
 from api_diagnostics import report_failure
+from lesson_status import lesson_status_context
 from session_store import SessionStore, load_or_create_secret
 from institutions import InstitutionDirectory, validate_institution_code
 from view_models import today, school_year, grade_summary, absence_rows, test_rows, plain_text
@@ -166,22 +167,18 @@ def login():
 def dashboard():
     api = current_user.kreta
     start, end = school_year()
-    now = datetime.now().astimezone()
-    from zoneinfo import ZoneInfo
-    now = now.astimezone(ZoneInfo('Europe/Budapest'))
     day = today().isoformat()
     student = fetch_part('Tanulói adatok', api.get_student_data, {})
     lessons = fetch_part('Órarend', lambda: api.get_lessons(day, (today() + timedelta(days=7)).isoformat()), [])
     lessons = sorted(lessons, key=lambda row: (row.get('date', ''), row.get('start_time', '')))
-    upcoming = [l for l in lessons if (l.get('date', ''), l.get('end_time', '')) > (day, now.strftime('%H:%M')) and 'elmaradt' not in l.get('state', '').lower()]
     grades = fetch_part('Értékelések', lambda: api.get_grades(start, end), [])
     homework = fetch_part('Házi feladatok', lambda: api.get_homework(day, (today() + timedelta(days=14)).isoformat()), [])
     tests = fetch_part('Dolgozatok', lambda: api.get_announced_tests(day), [])
     dates = fetch_part('Tanév rendje', api.get_school_year_dates, [])
-    return render_template('dashboard.html', student_data=student, next_lesson=upcoming[0] if upcoming else None,
+    return render_template('dashboard.html', student_data=student,
                            today_lessons=[l for l in lessons if l.get('date') == day], stats=grade_summary(grades),
                            homework=sorted(homework, key=lambda h: h.get('deadline', ''))[:4], tests=test_rows(tests)[:3],
-                           school_year_dates=dates)
+                           school_year_dates=dates, **lesson_status_context(lessons))
 
 
 @app.route('/orarend')
