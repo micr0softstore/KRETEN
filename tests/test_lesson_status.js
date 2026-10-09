@@ -21,7 +21,9 @@ test('remaining time and elapsed progress are bounded at exact edges', () => {
   assert.equal(currentStatus(lessons, epoch('08:22:30')).progress, 50);
   const lastSecond = currentStatus(lessons, epoch('08:44:59'));
   assert.equal(lastSecond.remaining, '0 perc 01 mp van hátra');
-  assert.ok(lastSecond.progress <= 100);
+  assert.ok(lastSecond.progress < 100);
+  assert.ok(lastSecond.progress > 99.9);
+  assert.ok(currentStatus(lessons, epoch('08:00:01')).progress > 0);
   const middleBreak = currentStatus(lessons, epoch('08:52:30'));
   assert.equal(middleBreak.remaining, '7 perc 30 mp van hátra');
   assert.equal(middleBreak.progress, 50);
@@ -61,6 +63,7 @@ test('mounted card uses server time and updates visible countdown and progress t
   }]));
   const card = {
     dataset: {lessonClock: JSON.stringify({server_now: epoch('08:44:59'), lessons})},
+    style: {properties: {}, setProperty(key, value) { this.properties[key] = value; }},
     querySelector(selector) { return parts[selector.match(/data-lesson-(.+)\]/)[1]]; }
   };
   let browserNow = epoch('20:00:00'); // Deliberately incorrect local clock.
@@ -74,17 +77,27 @@ test('mounted card uses server time and updates visible countdown and progress t
   assert.equal(parts.title.textContent, 'Matematika');
   assert.equal(parts.remaining.textContent, '0 perc 01 mp van hátra');
   assert.equal(parts.timer.hidden, false);
+  assert.ok(parseFloat(card.style.properties['--lesson-progress']) > 99.9);
+  assert.equal(card.style.properties['--lesson-progress-duration'], '0s');
   browserNow += 1000;
   tick();
   assert.equal(parts.title.textContent, 'Szünet');
   assert.equal(parts.remaining.textContent, '15 perc 00 mp van hátra');
   assert.equal(parts.progress.value, 0);
+  assert.equal(card.style.properties['--lesson-progress'], '0%');
+  assert.equal(card.style.properties['--lesson-progress-duration'], '0s');
   assert.equal(parts.progress.attributes['aria-label'], 'A szünet eltelt része');
-  browserNow += 15 * 60 * 1000;
+  browserNow += 1000;
+  tick();
+  assert.ok(parseFloat(card.style.properties['--lesson-progress']) > 0);
+  assert.equal(card.style.properties['--lesson-progress-duration'], '1s');
+  assert.equal(parts.progress.attributes['aria-valuetext'], '0% · 14 perc 59 mp van hátra');
+  browserNow += 15 * 60 * 1000 - 1000;
   tick();
   assert.equal(parts.title.textContent, 'Angol');
   assert.equal(parts.remaining.textContent, '45 perc 00 mp van hátra');
   browserNow += 45 * 60 * 1000;
   tick();
   assert.equal(parts.timer.hidden, true);
+  assert.equal(card.style.properties['--lesson-progress'], '0%');
 });

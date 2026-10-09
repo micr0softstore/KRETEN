@@ -54,7 +54,7 @@ def _read(path):
 def _listening(port):
     with socket.socket() as probe:
         probe.settimeout(0.3)
-        result = probe.connect_ex(('127.0.0.1', port))
+        result = probe.connect_ex(('0.0.0.0', port))
         if result == 0:
             return True
         if result == errno.ECONNREFUSED:
@@ -68,13 +68,13 @@ def run_local(app, instance_path, port=5050):
         if not _acquire(lock):
             raise RuntimeError(f'A managed KRETÉN server is already running on port {port}.')
         # Bind before creating a marker: an unrelated listener is never managed.
-        server = make_server('127.0.0.1', port, app, threaded=True)
+        server = make_server('0.0.0.0', port, app, threaded=True)
         server.timeout = 0.3
         run_id = secrets.token_hex(16)
         try:
             stopping.unlink(missing_ok=True)
             _write(running, run_id)
-            print(f'KRETÉN: http://127.0.0.1:{port} — stop with PORT={port} python3 app.py --stop', flush=True)
+            print(f'KRETÉN: http://0.0.0.0:{port} — stop with PORT={port} python3 app.py --stop', flush=True)
             while _read(stopping) != run_id:
                 server.handle_request()
         except KeyboardInterrupt:

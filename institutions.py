@@ -9,11 +9,6 @@ from urllib.parse import quote
 
 DIRECTORY_URL = 'https://kretaglobalapi.e-kreta.hu/intezmenyek/kreta/publikus'
 SEARCH_URL = 'https://intezmenykereso.e-kreta.hu/instituteSelector/'
-FALLBACK_INSTITUTIONS = [{
-    'name': 'Biatorbágyi Innovatív Technikum és Gimnázium',
-    'code': 'bit-edu', 'id': '910018', 'city': 'Biatorbágy',
-    'label': 'Biatorbágyi Innovatív Technikum és Gimnázium (bit-edu · 910018)',
-}]
 
 
 def validate_institution_code(value):
@@ -115,7 +110,7 @@ class InstitutionDirectory:
             searched = self._search(query)
             if searched is not None:
                 return {'institutions': [dict(row) for row in searched], 'source': 'kreta-search', 'stale': False}
-        rows = self._institutions or FALLBACK_INSTITUTIONS
+        rows = self._institutions or []
         if query:
             needle = _search_text(query)
             rows = [row for row in rows if needle in _search_text(row['label'] + ' ' + row['city'])]

@@ -10,25 +10,6 @@ const savePreference = (key, value) => {
 
 (() => {
   const root = document.documentElement;
-  const saved = readPreference('kreten_theme') || readPreference('theme');
-  const systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-  const setTheme = (theme) => {
-    root.dataset.theme = theme;
-    document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
-      button.setAttribute('aria-label', theme === 'dark' ? 'Világos megjelenés bekapcsolása' : 'Sötét megjelenés bekapcsolása');
-      button.setAttribute('title', theme === 'dark' ? 'Világos megjelenés' : 'Sötét megjelenés');
-      button.setAttribute('aria-pressed', String(theme === 'dark'));
-    });
-  };
-  setTheme(saved === 'dark' || saved === 'light' ? saved : (systemDark ? 'dark' : 'light'));
-  document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
-    button.addEventListener('click', () => {
-      const theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
-      setTheme(theme);
-      savePreference('kreten_theme', theme);
-    });
-  });
-
   const sidebar = document.querySelector('.sidebar');
   const backdrop = document.querySelector('.sidebar-backdrop');
   let menuTrigger = null;
@@ -195,7 +176,7 @@ const savePreference = (key, value) => {
   };
   const renderList = () => {
     const term = selectedInstitution && search.value === selectedInstitution.name ? '' : normalize(search.value);
-    const allMatches = remoteDirectory && remoteResults !== null && remoteQuery === term
+    const allMatches = !term && !selectedInstitution ? [] : remoteDirectory && remoteResults !== null && remoteQuery === term
       ? remoteResults
       : institutions.filter((institution) => normalize(`${institution.name} ${institution.code} ${institution.id || ''}`).includes(term));
     if (selectedInstitution && !allMatches.some((institution) => institution.code === selectedInstitution.code)) allMatches.unshift(selectedInstitution);
@@ -219,13 +200,13 @@ const savePreference = (key, value) => {
     if (!matches.length) {
       const empty = document.createElement('li');
       empty.className = 'institution-option-empty';
-      empty.textContent = 'Nincs találat. Próbálj másik nevet, vagy add meg az intézménykódot kézzel.';
+      empty.textContent = !term ? 'Írd be az iskolád nevét, intézménykódját vagy OM-azonosítóját.' : 'Nincs találat. Próbálj másik nevet, vagy add meg az intézménykódot kézzel.';
       list.append(empty);
     }
     list.hidden = false;
     search.setAttribute('aria-expanded', 'true');
     activate(-1);
-    if (!selectedInstitution) help.textContent = allMatches.length > 60 ? `${allMatches.length} találat. A pontosabb listához írj be több betűt.` : `${allMatches.length} intézmény. Válassz a listából.`;
+    if (!selectedInstitution) help.textContent = !term ? 'Keress név, intézménykód vagy OM-azonosító alapján.' : allMatches.length > 60 ? `${allMatches.length} találat. A pontosabb listához írj be több betűt.` : `${allMatches.length} intézmény. Válassz a listából.`;
   };
   const showQueryLoading = () => {
     matches = [];
@@ -268,7 +249,7 @@ const savePreference = (key, value) => {
         remoteQuery = term;
         remoteResults = cleanInstitutions(data.institutions);
         status.textContent = data.source === 'fallback'
-          ? 'Az élő kereső most nem érhető el. Az ismert találatokból választhatsz, vagy a kódot kézzel is megadhatod.'
+          ? 'Az élő kereső most nem érhető el. Próbáld újra később, vagy add meg az intézménykódot kézzel.'
           : data.stale ? 'A legutóbb elérhető találatokat mutatjuk. Az intézménykód kézzel is megadható.' : '';
         if (search.getAttribute('aria-expanded') === 'true' && document.activeElement === search) renderList();
       } catch (_) {

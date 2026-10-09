@@ -269,25 +269,36 @@ class InstitutionTests(unittest.TestCase):
     def test_live_search_fallback_is_cached_and_url_encoded(self):
         directory = InstitutionDirectory()
         upstream = response()
-        upstream.text = '<a data-val="school-a">Synthetic (school-a - 42)</a>'
+        upstream.text = '<a data-val="bit-edu">Synthetic (bit-edu - 910018)</a>'
         with patch('requests.get', side_effect=[requests.ConnectionError(), upstream]) as http:
             result = directory.get('Biatorbágy')
             cached = directory.get('Biatorbágy')
+            blank = directory.get()
         self.assertEqual(result['source'], 'kreta-search')
         self.assertFalse(result['stale'])
+        self.assertEqual(result['institutions'][0]['code'], 'bit-edu')
+        self.assertEqual(result['institutions'][0]['id'], '910018')
         self.assertEqual(cached, result)
+        self.assertEqual(blank['institutions'], [])
         self.assertEqual(http.call_count, 2)
         self.assertIn('Biatorb%C3%A1gy', http.call_args.args[0])
         self.assertEqual(http.call_args.kwargs['params'], {'showOnlyLive': 'true'})
 
-    def test_unavailable_directory_explicit_fallback_and_manual_codes(self):
+    def test_unavailable_directory_has_no_automatic_school_and_accepts_manual_codes(self):
         directory = InstitutionDirectory()
         with patch('requests.get', side_effect=requests.ConnectionError()):
             result = directory.get()
         self.assertTrue(result['stale'])
         self.assertEqual(result['source'], 'fallback')
-        self.assertEqual(result['institutions'][0]['code'], 'bit-edu')
+        self.assertEqual(result['institutions'], [])
         self.assertEqual(validate_institution_code('another-school'), 'another-school')
+
+    def test_failed_search_does_not_invent_a_matching_school(self):
+        directory = InstitutionDirectory()
+        with patch('requests.get', side_effect=requests.ConnectionError()) as http:
+            result = directory.get('bit-edu')
+        self.assertEqual(http.call_count, 2)
+        self.assertEqual(result, {'institutions': [], 'source': 'fallback', 'stale': True})
 
 
 if __name__ == '__main__':

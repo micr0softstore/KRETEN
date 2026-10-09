@@ -24,7 +24,9 @@
       return state;
     }
     state.remaining = remainingText(end - now);
-    state.progress = Math.round(Math.min(100, Math.max(0, (now - start) / (end - start) * 100)));
+    // Keep fractional progress so a long lesson fills steadily every second.
+    state.progress = Math.min(100, Math.max(0, (now - start) / (end - start) * 100));
+    state.interval = `${start}:${end}`;
     return state;
   }
 
@@ -37,16 +39,29 @@
     const offset = payload.server_now - Date.now();
     const parts = {};
     ['label', 'date', 'title', 'details', 'teacher', 'remaining', 'timer', 'progress'].forEach(name => { parts[name] = card.querySelector(`[data-lesson-${name}]`); });
+    let previousState;
+    let previousNow;
     const render = () => {
-      const state = currentStatus(payload.lessons, Date.now() + offset);
+      const now = Date.now() + offset;
+      const state = currentStatus(payload.lessons, now);
       ['label', 'date', 'title', 'details', 'teacher', 'remaining'].forEach(name => {
         const value = name === 'date' ? state.date || 'Szabad idő' : state[name];
         if (parts[name].textContent !== value) parts[name].textContent = value;
       });
       parts.timer.hidden = !['lesson', 'break'].includes(state.kind);
+      // Start each new interval immediately; never animate a full card backwards
+      // when a lesson ends. Returning to the page also catches up immediately.
+      const continues = previousState && state.interval === previousState.interval &&
+        state.kind === previousState.kind && state.progress >= previousState.progress &&
+        now - previousNow <= 2000;
+      card.style.setProperty('--lesson-progress-duration', continues ? '1s' : '0s');
+      card.style.setProperty('--lesson-progress', `${state.progress}%`);
       parts.progress.value = state.progress;
       parts.progress.setAttribute('aria-label', state.progress_label);
-      parts.progress.textContent = `${state.progress}%`;
+      parts.progress.setAttribute('aria-valuetext', `${Math.round(state.progress)}% · ${state.remaining}`);
+      parts.progress.textContent = `${Math.round(state.progress)}%`;
+      previousState = state;
+      previousNow = now;
     };
     render();
     // No live region: the clock remains readable without announcements every second.

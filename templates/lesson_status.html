@@ -1,4 +1,5 @@
-<section class="next-lesson card lesson-status" data-lesson-clock="{{ lesson_clock|tojson|forceescape }}" aria-label="Aktuális óra és szünet">
+<section class="next-lesson card lesson-status" data-lesson-clock="{{ lesson_clock|tojson|forceescape }}" style="--lesson-progress: {{ lesson_status.progress }}%" aria-label="Aktuális óra és szünet">
+  <div class="lesson-fill" aria-hidden="true"></div>
   <div class="card-body">
     <div class="row"><span class="eyebrow" data-lesson-label>{{ lesson_status.label }}</span><span class="badge" data-lesson-date>{{ lesson_status.date or 'Szabad idő' }}</span></div>
     <h2 data-lesson-title>{{ lesson_status.title }}</h2>

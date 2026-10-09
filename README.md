@@ -12,24 +12,25 @@ python3 -m venv .venv
 .venv/bin/python app.py
 ```
 
-Open http://127.0.0.1:5050. Search for your institution and select it, then enter your own KRÉTA credentials in the browser. The selected institution **code**, not its numeric identifier, is submitted. For example, Biatorbágyi Innovatív Technikum és Gimnázium uses `bit-edu`; its identifier is `910018`. Manual institution-code entry remains available.
+Open http://127.0.0.1:5050. Search for your institution and select it, then enter your own KRÉTA credentials in the browser. The selected institution **code**, not its numeric identifier, is submitted. Manual institution-code entry remains available.
 
 Stop this local server from any terminal in the project directory with `.venv/bin/python app.py --stop`. If you started it with a custom port, use the same port, for example `PORT=5053 .venv/bin/python app.py --stop`. The stop command verifies that the port has closed; older servers started before this control was added must be stopped through their original process.
 
-The full public institution directory is cached when available. If that service is unavailable, the picker searches KRÉTA's official institution selector as you type. It clearly marks partial/offline results.
+The full public institution directory is cached when available. If that service is unavailable, the picker searches KRÉTA's official institution selector as you type. An empty picker prompts you to search; no school is featured or inserted as a fallback. Results come from the directory or official search, with stale data and service failures clearly marked.
 
 Do not place credentials in source files, tests, screenshots, environment files, or logs. The application never persists a password. Do not use old token files for login.
 
 ## Pages and behavior
 
-- Overview: current/next lesson, today's timetable, recent grades, weighted average, upcoming homework/tests, school-year dates. Current lessons and breaks show a live countdown and elapsed-time progress bar, advancing automatically at lesson boundaries. An unavailable section does not prevent the others from rendering.
+- Overview: current/next lesson, today's timetable, recent grades, weighted average, upcoming homework/tests, school-year dates. Current lessons and breaks show a live countdown and a smooth elapsed-time fill across the full card, advancing automatically at lesson boundaries; native progress semantics remain available to screen readers. An unavailable section does not prevent the others from rendering.
 - Timetable: previous/current/next week, subject/teacher/room filtering, canceled and substituted lessons, expandable details. Weekend lessons are retained when present. Times use Europe/Budapest.
 - Grades: subject groups, explicit weights, textual grades, semester filters, reveal-on-click preference, overall/monthly/per-subject statistics and custom date-range analysis.
 - Homework and announced tests; homework ranges longer than three weeks are split into bounded API requests and merged without duplicate IDs. Offset timestamps are converted to Europe/Budapest before deriving calendar dates, including exam dates; date-only values stay unchanged. Absences show justification status and lateness minutes.
 - Messages opens school notices from Feljegyzések and Faliújság, combined newest first with expandable text and search. These diary notices remain separate from the e-administration mailbox folders.
 - Inbox/sent/deleted folders and message details use the same separate folder endpoints as KRÉTA’s current web client; parsing tolerates optional message fields and nested detail metadata. These requests use separate service headers because the diary mobile identifier causes connection resets at the e-administration service. External HTML is rendered as non-executable text.
 - Consultation schedules, LEP events and permissions, profile/contact/bank-account actions, appearance settings.
-- Desktop sidebar, mobile drawer/bottom navigation, light/dark mode, locally served CSS/JS and concept logos. No CDN dependency.
+- Desktop sidebar, mobile drawer/bottom navigation, translucent glass cards and navigation, locally served CSS/JS and concept logos. No CDN dependency.
+- Appearance settings combine independent light/dark modes with six color themes: Ocean, Lavender, Mint, Sunset, Rose and Graphite. Themes apply to backgrounds, cards and accents, and saved preferences load before the first paint.
 - Animated login background with two custom colors, presets and a pause control. Appearance preferences are saved in browser local storage; reduced-motion preferences are respected.
 
 Numeric grade statistics accept only 1–5, apply the supplied percentage weights, and exclude textual/non-numeric entries from arithmetic. Empty data displays a dash rather than a fabricated zero. Charts show monthly weighted averages. All calculations run in Python; templates no longer call the unavailable `max()` global that caused the marks page failure.

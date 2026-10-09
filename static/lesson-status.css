@@ -1,1 +1,57 @@
-.lesson-status .card-body{padding-bottom:30px}.lesson-status h2{overflow-wrap:anywhere}.lesson-status [data-lesson-details],.lesson-status [data-lesson-teacher]{padding-right:28px}.lesson-timer{margin:23px 30px 0 0}.lesson-timer[hidden]{display:none}.lesson-remaining{display:block;font-size:.95rem;font-variant-numeric:tabular-nums;letter-spacing:.01em}.lesson-progress{display:block;width:100%;height:7px;margin-top:12px;border:0;border-radius:20px;overflow:hidden;background:#ffffff35;accent-color:#fff;appearance:none}.lesson-progress::-webkit-progress-bar{background:#ffffff35;border-radius:20px}.lesson-progress::-webkit-progress-value{background:#fff;border-radius:20px}.lesson-progress::-moz-progress-bar{background:#fff;border-radius:20px}.lesson-status .next-arrow{bottom:27px}
+.lesson-status {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.lesson-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  z-index: 0;
+  width: var(--lesson-progress, 0%);
+  background: var(--lesson-fill, color-mix(in srgb, var(--accent) 24%, transparent));
+  pointer-events: none;
+  transition: width var(--lesson-progress-duration, 0s) linear;
+}
+
+.lesson-status .card-body {
+  position: relative;
+  z-index: 1;
+  padding-bottom: 30px;
+}
+
+.lesson-status h2 { overflow-wrap: anywhere; }
+.lesson-status [data-lesson-details],
+.lesson-status [data-lesson-teacher] { padding-right: 28px; }
+.lesson-timer { margin: 23px 30px 0 0; }
+.lesson-timer[hidden] { display: none; }
+
+.lesson-remaining {
+  display: inline-block;
+  padding: 7px 11px;
+  border-radius: 10px;
+  background: var(--lesson-timer-bg, var(--surface));
+  color: var(--lesson-timer-text, inherit);
+  font-size: .95rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .01em;
+}
+
+/* The card is the visual meter; retain native progress semantics for readers. */
+.lesson-progress {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.lesson-status .next-arrow { bottom: 27px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .lesson-fill { transition: none; }
+}

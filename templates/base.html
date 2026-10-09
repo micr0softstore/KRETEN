@@ -33,6 +33,7 @@
     <meta name="color-scheme" content="light dark">
     <meta name="theme-color" content="#10141f">
     <title>{% block title %}KRETÉN{% endblock %}</title>
+    <script src="{{ url_for('static', filename='appearance.js') }}"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
     <script src="{{ url_for('static', filename='app.js') }}" defer></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='pages.css') }}">
@@ -40,6 +41,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='wallpaper.css') }}">
     <script src="{{ url_for('static', filename='wallpaper.js') }}" defer></script>
     {% block extra_head %}{% endblock %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='glass.css') }}">
 </head>
 <body class="{% if current_user.is_authenticated %}app-page{% else %}auth-page{% endif %}">
     <a href="#main-content" class="skip-link">Ugrás a tartalomhoz</a>

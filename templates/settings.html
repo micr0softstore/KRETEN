@@ -1,4 +1,39 @@
-{% extends 'base.html' %}{% from 'components.html' import heading %}{% block title %}Beállítások · KRETÉN{% endblock %}{% block content %}
-{{ heading('Legyen a te naplód.', 'Apró beállítások a kényelmesebb mindennapokhoz.', 'BEÁLLÍTÁSOK') }}
-<div class="two-column"><section class="card"><div class="card-header"><h2 class="card-title">Megjelenés</h2></div><div class="card-body stack"><div class="setting-row"><div><strong>Világos vagy sötét?</strong><p class="muted small">A választásodat ez a böngésző megjegyzi.</p></div><button type="button" class="button button-secondary" data-theme-toggle>Téma váltása</button></div><div class="setting-row"><div><strong>Bejelentkezési háttér</strong><p class="muted small">Mozgó színkeverék, a saját színeiddel.</p></div><button type="button" class="button button-secondary" data-wallpaper-open aria-haspopup="dialog" aria-controls="wallpaper-settings">Háttér és színek</button></div><label class="setting-row" for="private-grades"><span><strong>Jegyek elrejtése</strong><span class="muted small setting-description">Kattints egy elrejtett jegyre vagy átlagra, amikor készen állsz megnézni.</span></span><input type="checkbox" id="private-grades" data-grade-privacy></label></div></section><section class="card"><div class="card-header"><h2 class="card-title">A KRETÉN-ről</h2></div><div class="card-body"><p>A te naplód. Egy kicsit másképp.</p><p class="muted">Független webes kliens a KRÉTA rendszerhez. A felépítését a Firka inspirálta, az arculata a KRETÉN koncepciót követi.</p><p class="small muted">Az adatok a KRÉTA szolgáltatásaiból származnak. Ez a kliens nem a KRÉTA hivatalos alkalmazása.</p><a class="small" href="https://github.com/QwIT-Development/firka" target="_blank" rel="noopener noreferrer">Firka, a nyílt forráskódú inspiráció ↗</a></div></section></div>
+{% extends 'base.html' %}
+{% from 'components.html' import heading %}
+{% block title %}Beállítások · KRETÉN{% endblock %}
+{% block content %}
+{{ heading('Legyen a te naplód.', 'Egy kis szín. Egy kis nyugalom. Pont úgy, ahogy szereted.', 'BEÁLLÍTÁSOK') }}
+<div class="settings-grid">
+  <section class="card appearance-card" aria-labelledby="appearance-title">
+    <div class="card-header"><h2 class="card-title" id="appearance-title">Megjelenés</h2><span class="badge">A te stílusod</span></div>
+    <div class="card-body">
+      <fieldset class="appearance-fieldset">
+        <legend>Világos vagy sötét?</legend>
+        <div class="display-choices">
+          <label class="display-choice"><input type="radio" name="display-theme" value="light" data-display-theme><span>{{ icon('sun') }} Világos</span></label>
+          <label class="display-choice"><input type="radio" name="display-theme" value="dark" data-display-theme><span>{{ icon('moon') }} Sötét</span></label>
+        </div>
+      </fieldset>
+      <fieldset class="appearance-fieldset">
+        <legend>Színtéma</legend>
+        <p class="small muted">A háttér, a kártyák és a kiemelések együtt váltanak színt.</p>
+        <div class="color-choices">
+          {% for value, label in [('ocean', 'Óceán'), ('lavender', 'Levendula'), ('mint', 'Menta'), ('sunset', 'Naplemente'), ('rose', 'Rózsa'), ('graphite', 'Grafit')] %}
+          <label class="color-choice palette-{{ value }}">
+            <input type="radio" name="color-theme" value="{{ value }}" data-color-theme-choice>
+            <span class="palette-preview" aria-hidden="true"><span class="palette-mini-nav"></span><span class="palette-mini-card"></span><span class="palette-mini-card secondary"></span><span class="palette-check">✓</span></span>
+            <span class="palette-name">{{ label }}</span>
+          </label>
+          {% endfor %}
+        </div>
+      </fieldset>
+      <p class="appearance-save-note" data-appearance-storage role="status">A választásod automatikusan mentődik ebben a böngészőben.</p>
+      <div class="setting-row"><div><strong>Bejelentkezési háttér</strong><p>Mozgó színkeverék, a saját színeiddel.</p></div><button type="button" class="button button-secondary" data-wallpaper-open aria-haspopup="dialog" aria-controls="wallpaper-settings">Háttér és színek</button></div>
+    </div>
+  </section>
+  <div class="stack">
+    <section class="card"><div class="card-header"><h2 class="card-title">Kényelem</h2></div><div class="card-body"><label class="setting-row" for="private-grades"><span><strong>Jegyek elrejtése</strong><span class="muted small setting-description">Kattints egy elrejtett jegyre vagy átlagra, amikor készen állsz megnézni.</span></span><input type="checkbox" id="private-grades" data-grade-privacy></label></div></section>
+    <section class="card about-card"><div class="card-header"><h2 class="card-title">A KRETÉN-ről</h2>{{ icon('sparkle') }}</div><div class="card-body"><p class="about-tagline">A te naplód.<br>Egy kicsit másképp.</p><p class="muted small">Független webes kliens a KRÉTA rendszerhez. A felépítését a Firka inspirálta, az arculata a KRETÉN koncepciót követi.</p><p class="small muted">Az adatok a KRÉTA szolgáltatásaiból származnak. Ez a kliens nem a KRÉTA hivatalos alkalmazása.</p><a class="small" href="https://github.com/QwIT-Development/firka" target="_blank" rel="noopener noreferrer">Firka, a nyílt forráskódú inspiráció ↗</a></div></section>
+  </div>
+</div>
 {% endblock %}
